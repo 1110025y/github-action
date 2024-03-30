@@ -255,5 +255,5 @@ resource "aws_cloudwatch_metric_alarm" "scaling_in" {
     ServiceName = aws_ecs_service.service.name
   }
 
-  alarm_actions = [aws_appautoscaling_policy.scaling_in_policy.arn]
+  alarm_actions = [aws_appautoscaling_policy.scaling_in_policy.ar]
 }

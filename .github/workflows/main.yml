@@ -12,6 +12,10 @@ on:
 permissions:
   id-token: write
   contents: read
+  
+env:
+  AWS_REGION: ap-northeast-1
+  TF_VERSION: 1.7.5
     
  #ワークフロー内のジョブグループ      
 jobs:
@@ -24,11 +28,6 @@ jobs:
 
     #ジョブ実行するマシンのタイプ
     runs-on: ubuntu-latest
-    
-    #ジョブの権限設定
-    # permissions:
-    #   id-token: write
-    #   contents: read
       
     #タスクのグループ  
     steps:
@@ -47,18 +46,27 @@ jobs:
       uses: aws-actions/configure-aws-credentials@v4
       with:
         role-to-assume: ${{secrets.AWS_ROLE_ARN}}
-        aws-region: ap-northeast-1
+        aws-region: ${{ env.AWS_REGION }}
  
     #hashicorpの公式のアクション
     #https://github.com/hashicorp/setup-terraform
     - name: Setup Terraform
       uses: hashicorp/setup-terraform@v2
       with:
-        terraform_version: ~> 1.7.5
+        terraform_version: ~> ${{ env.TF_VERSION }}
  
     - name: Terraform Init
-      run: terraform init
+      run: terraform init -upgrade
       #working-directory: .terraform
     
+    - name: Check validate
+      id: validate-check
+      run: terraform validate
+    
+    - name: failure validate
+      if: failure() && step.validate-check.outcome == 'failure'
+      run: |
+        echo 'terraform syntax check failed'
+      
     - name: Terraform Plan
       run: terraform plan
