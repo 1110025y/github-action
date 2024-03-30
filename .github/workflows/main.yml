@@ -32,9 +32,6 @@ jobs:
       
     #タスクのグループ  
     steps:
-    # - name: set ROLE
-    #   run: |
-    #     echo "AWS_ROLE_ARN=$" >> $GITHUB_ENV
 
     #GitHubの公式アクション、CI/CDを実行するサーバへチェックアウト
     #https://github.com/actions/checkout
@@ -64,7 +61,7 @@ jobs:
       uses: hashicorp/terraform-github-actions@master
       with:
         tf_actions_version: ${{ env.TF_VERSION }}
-        tf_actions_subcommand: 'init'
+        tf_actions_subcommand: 'init -upgrade'
         tf_actions_working_dir: '.'
         tf_actions_comment: true
     
