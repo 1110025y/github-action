@@ -26,9 +26,9 @@ jobs:
     runs-on: ubuntu-latest
     
     #ジョブの権限設定
-    permissions:
-      id-token: write
-      contents: read
+    # permissions:
+    #   id-token: write
+    #   contents: read
       
     #タスクのグループ  
     steps:
