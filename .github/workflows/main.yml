@@ -44,7 +44,6 @@ jobs:
         path: "**/.terraform"
         key: init-${{ hashFiles('**/.terraform.lock.hcl') }}
 
-
     #AWS公式のアクション、AWSへの認証
     #https://github.com/aws-actions/configure-aws-credentials
     - name: 'Configure AWS Credentials'
