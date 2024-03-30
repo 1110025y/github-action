@@ -76,3 +76,4 @@ jobs:
     - name: 'Terraform Plan'
       if: steps.validate-check.outcome == 'success'
       run: terraform plan
+
