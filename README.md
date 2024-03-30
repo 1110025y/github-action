@@ -14,6 +14,7 @@ git reset --soft HEAD^
   
   
 ####  ・ロールのIAM ポリシー
+```
 {
     "Version": "2012-10-17",
     "Statement": [
@@ -32,3 +33,4 @@ git reset --soft HEAD^
         }
     ]
 }
+```
