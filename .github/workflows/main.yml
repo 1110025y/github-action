@@ -38,6 +38,7 @@ jobs:
     - name: 'Checkout'
       uses: actions/checkout@master
       
+    #キャッシュを取得
     - name: 'Cache Dependency'
       id: cache-init
       uses: actions/cache@v3
@@ -60,19 +61,24 @@ jobs:
       with:
         terraform_version: ${{ env.TF_VERSION }}
  
+    #ワークスペースの初期化
+    #取得したキャッシュがあった場合はスキップする
     - name: 'Terraform Init'
       if: steps.cache-init.outputs.cache-hit != 'true'
       run: terraform init -upgrade
     
+    #Terraformの構文チェック
     - name: 'Terraform Validate'
       id: validate-check
       run: terraform validate
     
+    #構文チェックに失敗したことを通知
     - name: 'Failure Validate'
       if: failure() && steps.validate-check.outcome == 'failure'
       run: |
         echo 'terraform syntax check failed'
       
+    #構文チェックが成功したらドライランを実行
     - name: 'Terraform Plan'
       if: steps.validate-check.outcome == 'success'
       run: terraform plan
