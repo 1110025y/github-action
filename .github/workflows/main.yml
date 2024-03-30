@@ -37,6 +37,13 @@ jobs:
     #https://github.com/actions/checkout
     - name: 'Checkout'
       uses: actions/checkout@master
+      
+    - name: Cache Dependency
+      uses: actions/cache@v3
+      with:
+        path: "**/.terraform"
+        key: init-${{ hashFiles('**/.terraform.lock.hcl') }}
+
 
     #AWS公式のアクション、AWSへの認証
     #https://github.com/aws-actions/configure-aws-credentials
