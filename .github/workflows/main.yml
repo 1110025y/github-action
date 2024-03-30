@@ -35,12 +35,12 @@ jobs:
 
     #GitHubの公式アクション、CI/CDを実行するサーバへチェックアウト
     #https://github.com/actions/checkout
-    - name: Checkout
+    - name: 'Checkout'
       uses: actions/checkout@master
 
     #AWS公式のアクション、AWSへの認証
     #https://github.com/aws-actions/configure-aws-credentials
-    - name: configure AWS credentials
+    - name: 'Configure AWS Credentials'
       uses: aws-actions/configure-aws-credentials@v4
       with:
         role-to-assume: ${{ env.AWS_ROLE_ARN }}
@@ -48,30 +48,22 @@ jobs:
  
     #hashicorpの公式のアクション
     #https://github.com/hashicorp/setup-terraform
-    - name: Setup Terraform
+    - name: 'Setup Terraform'
       uses: hashicorp/setup-terraform@v2
       with:
-        terraform_version: ~> ${{ env.TF_VERSION }}
+        terraform_version: ${{ env.TF_VERSION }}
  
-    - name: Terraform Init
+    - name: 'Terraform Init'
       run: terraform init -upgrade
     
-    # - name: 'Terraform Init'
-    #   uses: hashicorp/terraform-github-actions@master
-    #   with:
-    #     tf_actions_version: ${{ env.TF_VERSION }}
-    #     tf_actions_subcommand: 'init -upgrade'
-    #     tf_actions_working_dir: '.'
-    #     tf_actions_comment: true
-    
-    - name: Check validate
+    - name: 'Terraform Validate'
       id: validate-check
       run: terraform validate
     
-    - name: failure validate
+    - name: 'Failure Validate'
       if: failure() && steps.validate-check.outcome == 'failure'
       run: |
         echo 'terraform syntax check failed'
       
-    - name: Terraform Plan
+    - name: 'Terraform Plan'
       run: terraform plan
