@@ -24,6 +24,17 @@ jobs:
 
     #ジョブ実行するマシンのタイプ
     runs-on: ubuntu-latest
+    
+    #ジョブの権限設定
+    permissions:
+      id-token: write
+      contents: read
+      
+    #タスクのグループ  
+    steps:
+    - name: set ROLE
+      run: |
+        echo "AWS_ROLE_ARN=$" >> $GITHUB_ENV
 
     #タスクのグループ  
     steps:
@@ -38,7 +49,7 @@ jobs:
     - name: configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v4
       with:
-        role-to-assume: arn:aws:iam::422433474055:role/github-action-openids
+        role-to-assume: ${{secrets.AWS_ROLE_ARN}}
         aws-region: ap-northeast-1
  
     #hashicorpの公式のアクション
