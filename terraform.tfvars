@@ -18,4 +18,3 @@ zones = [
 alarm_config = {
   enable = false
 }
-

@@ -120,7 +120,7 @@ resource "aws_appautoscaling_target" "ecs_scaling" {
   resource_id        = "service/${aws_ecs_cluster.cluster.name}/${aws_ecs_service.service.name}"
   scalable_dimension = "ecs:service:DesiredCount"
   min_capacity       = 1
-  max_capacity       = 2
+  max_capacity       = 4
 
   // ECSのAutoscaling用のロールを指定する
   // 只、ここで指定しなくてもAWS側で設定されるみたい？？(AWSServiceRoleForECS)
@@ -144,41 +144,91 @@ resource "aws_appautoscaling_policy" "scaling_out_policy" {
     cooldown                = 300
     metric_aggregation_type = "Average"
 
-    // CPUの平均使用率が70%-80%の場合コンテナを3つ増やす
+    // CPUの平均使用率が70%-80%の場合コンテナを1つ増やす
     step_adjustment {
       metric_interval_lower_bound = 0
       metric_interval_upper_bound = 10
       scaling_adjustment          = 1
     }
 
-    // CPUの平均使用率が80%-90%の場合コンテナを5つ増やす
+    // CPUの平均使用率が80%-90%の場合コンテナを3つ増やす
     step_adjustment {
       metric_interval_lower_bound = 10
       metric_interval_upper_bound = 20
-      scaling_adjustment          = 2
+      scaling_adjustment          = 1
     }
 
-    // CPUの平均使用率が90%-の場合コンテナを10増やす
+    // CPUの平均使用率が90%-の場合コンテナを4増やす
     step_adjustment {
       metric_interval_lower_bound = 20
-      scaling_adjustment          = 3
+      scaling_adjustment          = 1
     }
   }
 }
 
+
+resource "aws_appautoscaling_policy" "scaling_in_policy" {
+  name = "${var.project_name.test_ecs["tentative"]}-${var.project_name.test_ecs["service_name"]}-scaling_in"
+  // 一意のリソースIDを作成
+  resource_id = "service/${aws_ecs_cluster.cluster.name}/${aws_ecs_service.service.name}"
+  // 対象スケーラブルターゲット
+  scalable_dimension = aws_appautoscaling_target.ecs_scaling.scalable_dimension
+  service_namespace  = aws_appautoscaling_target.ecs_scaling.service_namespace
+
+  policy_type = "StepScaling"
+
+  step_scaling_policy_configuration {
+    adjustment_type         = "ChangeInCapacity"
+    cooldown                = 300
+    metric_aggregation_type = "Average"
+
+    // CPUの平均使用率が70%-80%の場合コンテナを1つ増やす
+    step_adjustment {
+      metric_interval_lower_bound = -5
+      scaling_adjustment          = -1
+    }
+
+    // CPUの平均使用率が80%-90%の場合コンテナを3つ増やす
+    step_adjustment {
+      metric_interval_lower_bound = 10
+      scaling_adjustment          = -1
+    }
+
+    // CPUの平均使用率が90%-の場合コンテナを4増やす
+    step_adjustment {
+      metric_interval_lower_bound = 15
+      scaling_adjustment          = -1
+    }
+  }
+}
+
+
 // 起動しているコンテナのCPU使用率をみて
 // アラーム発報させてオートスケールターゲットを起動
-resource "aws_cloudwatch_metric_alarm" "out" {
-  count = var.alarm_config["enable"] ? 1 : 0
+locals {
+  scaling_out = {
+    "threshold-1" = "70"
+    "threshold-2" = "80"
+    "threshold-3" = "90"
+  }
+  scaling_in = {
+    "threshold-1" = "65"
+    "threshold-2" = "75"
+    "threshold-3" = "85"
+  }
+}
 
-  alarm_name          = "${var.project_name.test_ecs["tentative"]}-${var.project_name.test_ecs["service_name"]}-out"
+resource "aws_cloudwatch_metric_alarm" "scaling_out" {
+  for_each = var.alarm_config["enable"] ? local.scaling_out : {}
+
+  alarm_name          = "${var.project_name.test_ecs["tentative"]}-${var.project_name.test_ecs["service_name"]}-scaling-out"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = "1"
   metric_name         = "CPUUtilization"
   namespace           = "AWS/ECS"
   period              = "300"
   statistic           = "Average"
-  threshold           = "70"
+  threshold           = each.value
 
   dimensions = {
     ClusterName = aws_ecs_cluster.cluster.name
@@ -186,4 +236,24 @@ resource "aws_cloudwatch_metric_alarm" "out" {
   }
 
   alarm_actions = [aws_appautoscaling_policy.scaling_out_policy.arn]
+}
+
+resource "aws_cloudwatch_metric_alarm" "scaling_in" {
+  for_each = var.alarm_config["enable"] ? local.scaling_in : {}
+
+  alarm_name          = "${var.project_name.test_ecs["tentative"]}-${var.project_name.test_ecs["service_name"]}-scaling-in"
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  evaluation_periods  = "1"
+  metric_name         = "CPUUtilization"
+  namespace           = "AWS/ECS"
+  period              = "300"
+  statistic           = "Average"
+  threshold           = each.value
+
+  dimensions = {
+    ClusterName = aws_ecs_cluster.cluster.name
+    ServiceName = aws_ecs_service.service.name
+  }
+
+  alarm_actions = [aws_appautoscaling_policy.scaling_in_policy.arn]
 }

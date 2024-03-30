@@ -7,3 +7,95 @@ on:
   pull_request:
     # The branches below must be a subset of the branches above
     branches: [ main ]
+    
+ #ワークフロー内のジョブグループ      
+jobs:
+
+  #ジョブID
+  terraform-init:
+
+    #ジョブ名
+    name: Terraform Init
+
+    #ジョブ実行するマシンのタイプ
+    runs-on: ubuntu-latest
+
+    #ジョブの権限設定
+    permissions:
+      id-token: write
+      contents: read
+      
+    #タスクのグループ  
+    steps:
+    - name: set ROLE
+      run: |
+        echo "AWS_ROLE_ARN=$" >> $GITHUB_ENV
+
+    #GitHubの公式アクション、CI/CDを実行するサーバへチェックアウト
+    #https://github.com/actions/checkout
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    #AWS公式のアクション、AWSへの認証
+    #https://github.com/aws-actions/configure-aws-credentials
+    # - name: configure AWS credentials
+    #   uses: aws-actions/configure-aws-credentials@v2
+    #   with:
+    #     role-to-assume: ${{secrets.AWS_ROLE_ARN}}
+    #     aws-region: ap-northeast-1
+ 
+    #hashicorpの公式のアクション
+    #https://github.com/hashicorp/setup-terraform
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v2
+      with:
+        terraform_version: ~#ワークフロー内のジョブグループ      
+jobs:
+
+  #ジョブID
+  apply_tf:
+
+    #ジョブ名
+    name: Terraform apply
+
+    #ジョブ実行するマシンのタイプ
+    runs-on: ubuntu-latest
+
+    #ジョブの権限設定
+    permissions:
+      id-token: write
+      contents: read
+      
+    #タスクのグループ  
+    steps:
+    - name: set ROLE
+      run: |
+        echo "AWS_ROLE_ARN=$" >> $GITHUB_ENV
+
+    #GitHubの公式アクション、CI/CDを実行するサーバへチェックアウト
+    #https://github.com/actions/checkout
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    #AWS公式のアクション、AWSへの認証
+    #https://github.com/aws-actions/configure-aws-credentials
+    - name: configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v2
+      with:
+        role-to-assume: ${{secrets.AWS_ROLE_ARN}}
+        aws-region: ap-northeast-1
+ 
+    #hashicorpの公式のアクション
+    #https://github.com/hashicorp/setup-terraform
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v2
+      with:
+        terraform_version: ~> 1.7.5
+ 
+    - name: Terraform Init
+      run: terraform init
+      working-directory: .terraform     #.terraformにtfファイルがあるため
+ 
+    - name: Terraform Init
+      run: terraform init
+      working-directory: .terraform     #.terraformにtfファイルがあるため

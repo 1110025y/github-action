@@ -6,7 +6,7 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "~> 4.50.0"
+      version = "~> 5.43.0"
     }
   }
 }
@@ -27,10 +27,12 @@ provider "aws" {
 # ---------------------------------------------
 # Variables
 # ---------------------------------------------
-variable "project" {
-  type = string
-}
-
-variable "server" {
+variable "project_name" {
   type = map(any)
 }
+
+variable "availability_zones" {}
+
+variable "zones" {}
+
+variable "alarm_config" {}
