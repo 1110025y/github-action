@@ -38,10 +38,11 @@ jobs:
     - name: 'Checkout'
       uses: actions/checkout@master
       
-    - name: Cache Dependency
+    - name: 'Cache Dependency'
+      id: cache-init
       uses: actions/cache@v3
       with:
-        path: "**/.terraform"
+        path: '**/.terraform'
         key: init-${{ hashFiles('**/.terraform.lock.hcl') }}
 
     #AWS公式のアクション、AWSへの認証
@@ -60,6 +61,7 @@ jobs:
         terraform_version: ${{ env.TF_VERSION }}
  
     - name: 'Terraform Init'
+      if: steps.cache-init.outputs.cache-hit != 'true'
       run: terraform init -upgrade
     
     - name: 'Terraform Validate'
