@@ -32,9 +32,9 @@ jobs:
       
     #タスクのグループ  
     steps:
-    - name: set ROLE
-      run: |
-        echo "AWS_ROLE_ARN=$" >> $GITHUB_ENV
+    # - name: set ROLE
+    #   run: |
+    #     echo "AWS_ROLE_ARN=$" >> $GITHUB_ENV
 
     #GitHubの公式アクション、CI/CDを実行するサーバへチェックアウト
     #https://github.com/actions/checkout
