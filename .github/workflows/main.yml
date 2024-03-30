@@ -48,22 +48,22 @@ jobs:
  
     #hashicorpの公式のアクション
     #https://github.com/hashicorp/setup-terraform
-    # - name: Setup Terraform
-    #   uses: hashicorp/setup-terraform@v2
-    #   with:
-    #     terraform_version: ~> ${{ env.TF_VERSION }}
- 
-    # - name: Terraform Init
-    #   run: terraform init -upgrade
-      #working-directory: .terraform
-    
-    - name: 'Terraform Init'
-      uses: hashicorp/terraform-github-actions@master
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v2
       with:
-        tf_actions_version: ${{ env.TF_VERSION }}
-        tf_actions_subcommand: 'init -upgrade'
-        tf_actions_working_dir: '.'
-        tf_actions_comment: true
+        terraform_version: ~> ${{ env.TF_VERSION }}
+ 
+    - name: Terraform Init
+      run: terraform init -upgrade
+      working-directory: .terraform
+    
+    # - name: 'Terraform Init'
+    #   uses: hashicorp/terraform-github-actions@master
+    #   with:
+    #     tf_actions_version: ${{ env.TF_VERSION }}
+    #     tf_actions_subcommand: 'init -upgrade'
+    #     tf_actions_working_dir: '.'
+    #     tf_actions_comment: true
     
     - name: Check validate
       id: validate-check
@@ -74,5 +74,5 @@ jobs:
       run: |
         echo 'terraform syntax check failed'
       
-    # - name: Terraform Plan
-    #   run: terraform plan
+    - name: Terraform Plan
+      run: terraform plan
