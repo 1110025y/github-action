@@ -16,6 +16,7 @@ permissions:
 env:
   AWS_REGION: ap-northeast-1
   TF_VERSION: 1.7.5
+  AWS_ROLE_ARN: ${{secrets.AWS_ROLE_ARN}}
     
  #ワークフロー内のジョブグループ      
 jobs:
@@ -38,22 +39,22 @@ jobs:
     #GitHubの公式アクション、CI/CDを実行するサーバへチェックアウト
     #https://github.com/actions/checkout
     - name: Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@master
 
     #AWS公式のアクション、AWSへの認証
     #https://github.com/aws-actions/configure-aws-credentials
     - name: configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v4
       with:
-        role-to-assume: ${{secrets.AWS_ROLE_ARN}}
+        role-to-assume: ${{ env.AWS_ROLE_ARN }}
         aws-region: ${{ env.AWS_REGION }}
  
     #hashicorpの公式のアクション
     #https://github.com/hashicorp/setup-terraform
-    - name: Setup Terraform
-      uses: hashicorp/setup-terraform@v2
-      with:
-        terraform_version: ~> ${{ env.TF_VERSION }}
+    # - name: Setup Terraform
+    #   uses: hashicorp/setup-terraform@v2
+    #   with:
+    #     terraform_version: ~> ${{ env.TF_VERSION }}
  
     # - name: Terraform Init
     #   run: terraform init -upgrade
@@ -62,7 +63,7 @@ jobs:
     - name: 'Terraform Init'
       uses: hashicorp/terraform-github-actions@master
       with:
-        tf_actions_version: 1.7.5
+        tf_actions_version: ~> ${{ env.TF_VERSION }}
         tf_actions_subcommand: 'init'
         tf_actions_working_dir: '.'
         tf_actions_comment: true
@@ -76,5 +77,5 @@ jobs:
       run: |
         echo 'terraform syntax check failed'
       
-    - name: Terraform Plan
-      run: terraform plan
+    # - name: Terraform Plan
+    #   run: terraform plan
