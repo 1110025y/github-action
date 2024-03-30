@@ -64,7 +64,7 @@ jobs:
       run: terraform validate
     
     - name: failure validate
-      if: failure() && step.validate-check.outcome == 'failure'
+      if: failure() && steps.validate-check.outcome == 'failure'
       run: |
         echo 'terraform syntax check failed'
       
