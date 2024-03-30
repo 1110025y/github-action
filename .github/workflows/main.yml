@@ -21,10 +21,10 @@ env:
 jobs:
 
   #ジョブID
-  terraform-init:
+  terraform-setup:
 
     #ジョブ名
-    name: Terraform Init
+    name: Terraform Setup
 
     #ジョブ実行するマシンのタイプ
     runs-on: ubuntu-latest
