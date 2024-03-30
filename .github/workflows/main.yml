@@ -1,4 +1,4 @@
-name: terraform setup
+name: Terraform Github Actions
 
 on:
   workflow_dispatch:
@@ -21,7 +21,7 @@ env:
 jobs:
 
   #ジョブID
-  terraform-setup:
+  terraform:
 
     #ジョブ名
     name: Terraform Setup
@@ -55,9 +55,17 @@ jobs:
       with:
         terraform_version: ~> ${{ env.TF_VERSION }}
  
-    - name: Terraform Init
-      run: terraform init -upgrade
+    # - name: Terraform Init
+    #   run: terraform init -upgrade
       #working-directory: .terraform
+      
+    - name: 'Terraform Init'
+        uses: hashicorp/terraform-github-actions@master
+        with:
+          tf_actions_version: 1.7.5
+          tf_actions_subcommand: 'init'
+          tf_actions_working_dir: '.'
+          tf_actions_comment: true
     
     - name: Check validate
       id: validate-check
