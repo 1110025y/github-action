@@ -7,6 +7,11 @@ on:
   pull_request:
     # The branches below must be a subset of the branches above
     branches: [ main ]
+  
+#ジョブの権限設定
+permissions:
+  id-token: write
+  contents: read
     
  #ワークフロー内のジョブグループ      
 jobs:
@@ -20,11 +25,6 @@ jobs:
     #ジョブ実行するマシンのタイプ
     runs-on: ubuntu-latest
 
-    #ジョブの権限設定
-    permissions:
-      id-token: write
-      contents: read
-      
     #タスクのグループ  
     steps:
 
@@ -38,7 +38,7 @@ jobs:
     - name: configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v2
       with:
-        role-to-assume: ${{secrets.AWS_OPENID}}
+        role-to-assume: ${{ secrets.AWS_OPENID }}
         aws-region: ap-northeast-1
  
     #hashicorpの公式のアクション
