@@ -71,8 +71,10 @@ jobs:
     - name: 'Terraform Validate'
       id: validate-check
       run: |
-        i = terraform validate
+        i = ${{ env.cmond }}
         echo '${i}'
+      env:
+        cmond: terraform validate
     
     #構文チェックに失敗したことを通知
     - name: 'Failure Validate'
