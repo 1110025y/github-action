@@ -75,7 +75,7 @@ jobs:
       id: validate-check
       run: |
         terraform validate > test.txt
-        cat test=test.txt >> $GITHUB_OUTPUT
+        echo 'test=cat test.txt' >> $GITHUB_OUTPUT
     
     #構文チェックに失敗したことを通知
     - name: 'Failure Validate'
