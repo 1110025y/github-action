@@ -99,7 +99,7 @@ jobs:
       with:
         name: my-artifact
         path: |
-          ${{ env.TF_VERSION }}-result-plan.txt
+          ${{ env.TIME }}-result-plan.txt
 
 
   upload-to-s3:
