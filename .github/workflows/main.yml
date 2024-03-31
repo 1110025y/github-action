@@ -73,18 +73,25 @@ jobs:
     #Terraformの構文チェック
     - name: 'Terraform Validate'
       id: validate-check
-      run: |
-        terraform validate > test.txt
+      run: terraform validate > result.txt
     
     #構文チェックに失敗したことを通知
     - name: 'Failure Validate'
       if: failure() && steps.validate-check.outcome == 'failure'
       run: |
         echo 'terraform syntax check failed'
-        cat test.txt
+        cat result.txt
       
     #構文チェックが成功したらドライランを実行
     - name: 'Terraform Plan'
       if: steps.validate-check.outcome == 'success'
-      run: terraform plan
+      run: |
+        cat result.txt
+        terraform plan
+        
+    - name: 'Upload Artifact'
+        uses: actions/upload-artifact@v4
+        with:
+          name: my-artifact
+          path: result.txt
 
