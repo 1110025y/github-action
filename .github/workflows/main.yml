@@ -116,8 +116,9 @@ jobs:
         id: cache-awscli
         uses: actions/cache@v3
         with:
-          path: '**/aws'
-          path: '**/.aws'
+          path: |
+            '**/aws'
+            '**/.aws'
           key: awscli-${{ hashFiles('**/.terraform.lock.hcl') }}
         
       - name: 'AWS CLI Install'
