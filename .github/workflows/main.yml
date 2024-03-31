@@ -132,5 +132,6 @@ jobs:
       - name: 'Upload to S3'
         run: |
           aws --version
+          mv result-plan.txt ${{ env.TIME }}result-plan.txt
           aws s3 cp result-plan.txt ${{ env.S3_PATH }}
           
