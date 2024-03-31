@@ -90,15 +90,15 @@ jobs:
         time=$(date '+%Y/%m/%d_%H:%M:%S')
         echo $time
         cat result-validate.txt
-        terraform plan > result-plan.txt
-        cat result-plan.txt
+        terraform plan > $time-result-plan.txt
+        cat $time-result-plan.txt
     
     # アーティファクトアップロード
     - name: 'Upload Artifact'
       uses: actions/upload-artifact@v4
       with:
         name: my-artifact
-        path: result-plan.txt
+        path: $time-result-plan.txt
 
 
   upload-to-s3:
@@ -141,5 +141,7 @@ jobs:
         run: |
           aws --version
           which aws
-          aws s3 cp result-plan.txt ${{ env.S3_PATH }}
+          cd /usr/local/bin/aws
+          ls -la
+          # aws s3 cp result-plan.txt ${{ env.S3_PATH }}
           
