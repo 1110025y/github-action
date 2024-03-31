@@ -81,7 +81,7 @@ jobs:
       if: failure() && steps.validate-check.outcome == 'failure'
       run: |
         echo 'terraform syntax check failed'
-        echo 'cat test.txt'
+        cat test.txt
       
     #構文チェックが成功したらドライランを実行
     - name: 'Terraform Plan'
