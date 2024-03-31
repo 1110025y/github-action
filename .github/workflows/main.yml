@@ -127,3 +127,4 @@ jobs:
       - name: 'Upload to S3'
         run: |
           aws --version
+          aws s3 cp result-plan.txt s3://code.yaml
