@@ -95,8 +95,8 @@ jobs:
       if: steps.validate-check.outcome == 'success'
       run: |
         cat result-validate.txt
-        terraform plan > ${{ steps.api.outputs.month }}-result-plan.txt
-        cat ${{ steps.api.outputs.month }}-result-plan.txt
+        terraform plan > ${{ steps.api.outputs.data }}-result-plan.txt
+        cat ${{ steps.api.outputs.data }}-result-plan.txt
         
     # アーティファクトアップロード
     - name: 'Upload Artifact'
@@ -104,7 +104,7 @@ jobs:
       with:
         name: my-artifact
         path: |
-          ${{ steps.api.outputs.month }}-result-plan.txt
+          ${{ steps.api.outputs.data }}-result-plan.txt
 
 
   # upload-to-s3:
