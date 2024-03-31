@@ -98,7 +98,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: my-artifact
-        path: $time-result-plan.txt
+        path: result-plan.txt
 
 
   upload-to-s3:
