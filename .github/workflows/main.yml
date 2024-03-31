@@ -88,7 +88,7 @@ jobs:
     - name: 'Terraform Plan'
       if: steps.validate-check.outcome == 'success'
       run: |
-        echo ${{ env.TIME }}
+        t=echo ${{ env.TIME }}
         cat result-validate.txt
         terraform plan > result-plan.txt
         cat result-plan.txt
@@ -99,7 +99,7 @@ jobs:
       with:
         name: my-artifact
         path: |
-          ${{ env.TIME }}-result-plan.txt
+          ${{ t }}-result-plan.txt
 
 
   upload-to-s3:
