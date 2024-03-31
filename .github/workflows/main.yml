@@ -92,14 +92,13 @@ jobs:
         cat result-validate.txt
         terraform plan > ${{ env.TIME }}-result-plan.json
         cat ${{ env.TIME }}-result-plan.json
-        ls -la
     
     # アーティファクトアップロード
     - name: 'Upload Artifact'
       uses: actions/upload-artifact@v4
       with:
         name: my-artifact
-        path: $(${{ env.TIME }}-result-plan.json)
+        path: '${{ env.TIME }}'-result-plan.json
 
 
   # upload-to-s3:
