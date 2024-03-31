@@ -116,6 +116,7 @@ jobs:
         id: cache-awscli
         uses: actions/cache@v3
         with:
+          path: '**/aws'
           path: '**/.aws'
           key: awscli-${{ hashFiles('**/.terraform.lock.hcl') }}
         
@@ -140,7 +141,5 @@ jobs:
       - name: 'Upload to S3'
         run: |
           aws --version
-          cd ~/
-          ls -la
-          # aws s3 cp result-plan.txt ${{ env.S3_PATH }}
+          aws s3 cp result-plan.txt ${{ env.S3_PATH }}
           
