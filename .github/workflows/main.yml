@@ -90,8 +90,7 @@ jobs:
         time=$(date +'%Y-%m')
         echo $time
         cat result-validate.txt
-        terraform plan > result-plan.txt
-        mv result-plan.txt result-plan/$time.txt
+        terraform plan > $time.json
         cat result-plan.txt
     
     # アーティファクトアップロード
