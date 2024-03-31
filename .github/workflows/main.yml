@@ -87,10 +87,11 @@ jobs:
     - name: 'Terraform Plan'
       if: steps.validate-check.outcome == 'success'
       run: |
-        time=$(date '+/%m/%d_%H:%M')
+        time=$(date '+%m/%d_%H:%M')
         echo $time
         cat result-validate.txt
-        terraform plan > result-plan-$time.txt
+        terraform plan > result-plan.txt
+        mv result-plan.txt result-plan_$time.txt
         cat result-plan.txt
     
     # アーティファクトアップロード
