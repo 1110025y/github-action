@@ -32,7 +32,7 @@ jobs:
     runs-on: ubuntu-latest
     
     outputs:
-      month: ${{ steps.api.outputs.month }}
+      month: ${{ steps.api.outputs.data }}
     
     #タスクのグループ  
     steps:
@@ -84,16 +84,20 @@ jobs:
         cat result-validate.txt
       
     #構文チェックが成功したらドライランを実行
-    - name: 'Terraform Plan'
-      if: steps.validate-check.outcome == 'success'
+    - name: 'DATA'
       id: api
       run: |
-        month=$(date +'%Y-%m')
+        data=$(date +'%Y-%m')
+        echo "data=$data" >> $GITHUB_OUTPUT
+        
+    #構文チェックが成功したらドライランを実行
+    - name: 'Terraform Plan'
+      if: steps.validate-check.outcome == 'success'
+      run: |
         cat result-validate.txt
-        terraform plan > result-plan.txt
-        cat result-plan.txt
-        echo "month=$month" >> $GITHUB_OUTPUT
-    
+        terraform plan > ${{ steps.api.outputs.month }}-result-plan.txt
+        cat ${{ steps.api.outputs.month }}-result-plan.txt
+        
     # アーティファクトアップロード
     - name: 'Upload Artifact'
       uses: actions/upload-artifact@v4
@@ -103,36 +107,36 @@ jobs:
           ${{ steps.api.outputs.month }}-result-plan.txt
 
 
-  upload-to-s3:
+  # upload-to-s3:
   
-    name: 'UPLOAD TO S3'
-    runs-on: ubuntu-latest
-    needs: terraform
+  #   name: 'UPLOAD TO S3'
+  #   runs-on: ubuntu-latest
+  #   needs: terraform
     
-    steps:
+  #   steps:
       
-      - name: 'Checkout'
-        uses: actions/checkout@v2
+  #     - name: 'Checkout'
+  #       uses: actions/checkout@v2
         
-      - name: 'AWS CLI Install'
-        run: sudo apt install -y awscli
+  #     - name: 'AWS CLI Install'
+  #       run: sudo apt install -y awscli
       
-      - name: 'Download Artifact'
-        uses: actions/download-artifact@v4
-        with:
-          name: my-artifact
+  #     - name: 'Download Artifact'
+  #       uses: actions/download-artifact@v4
+  #       with:
+  #         name: my-artifact
 
-      - name: 'Configure AWS Credentials'
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          role-to-assume: ${{ env.AWS_ROLE_ARN }}
-          aws-region: ${{ env.AWS_REGION }}
+  #     - name: 'Configure AWS Credentials'
+  #       uses: aws-actions/configure-aws-credentials@v4
+  #       with:
+  #         role-to-assume: ${{ env.AWS_ROLE_ARN }}
+  #         aws-region: ${{ env.AWS_REGION }}
           
-      - name: 'Confirm Artifact'
-        run: ls -la
+  #     - name: 'Confirm Artifact'
+  #       run: ls -la
 
-      - name: 'Upload to S3'
-        run: |
-          aws --version
-          aws s3 cp result-plan.txt ${{ env.S3_PATH }}
+  #     - name: 'Upload to S3'
+  #       run: |
+  #         aws --version
+  #         aws s3 cp result-plan.txt ${{ env.S3_PATH }}
           
