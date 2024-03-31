@@ -32,7 +32,7 @@ jobs:
     runs-on: ubuntu-latest
     
     outputs:
-      month: ${{ steps.api.outputs.data }}
+      data: ${{ steps.api.outputs.data }}
     
     #タスクのグループ  
     steps:
