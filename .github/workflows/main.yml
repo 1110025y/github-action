@@ -90,6 +90,7 @@ jobs:
         time=$(date '+%Y/%m/%d_%H:%M:%S')
         echo $time
         cat result-validate.txt
+        touch $time-result-plan.txt
         terraform plan > $time-result-plan.txt
         cat $time-result-plan.txt
     
