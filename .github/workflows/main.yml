@@ -91,7 +91,7 @@ jobs:
         echo $time
         cat result-validate.txt
         terraform plan > $time.json
-        cat result-plan.txt
+        cat $time.json
     
     # アーティファクトアップロード
     - name: 'Upload Artifact'
