@@ -98,7 +98,8 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: my-artifact
-        path: "${{ env.TIME }}"-result-plan.txt
+        path: |
+          ${{ env.TF_VERSION }}-result-plan.txt
 
 
   upload-to-s3:
