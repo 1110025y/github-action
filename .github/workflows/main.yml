@@ -90,15 +90,15 @@ jobs:
       run: |
         echo ${{ env.TIME }}
         cat result-validate.txt
-        terraform plan > ${{ env.TIME }}-result-plan.json
-        cat ${{ env.TIME }}-result-plan.json
+        terraform plan > result-plan.json
+        cat result-plan.json
     
     # アーティファクトアップロード
     - name: 'Upload Artifact'
       uses: actions/upload-artifact@v4
       with:
         name: my-artifact
-        path: env.TIME-result-plan.json
+        path: result-plan.json
 
 
   # upload-to-s3:
