@@ -30,8 +30,8 @@ jobs:
     #ジョブ実行するマシンのタイプ
     runs-on: ubuntu-latest
     
-    outputs:
-      output1: ${{ steps.validate-check.outputs.test }}
+    # outputs:
+    #   output1: ${{ steps.validate-check.outputs.test }}
     
     #タスクのグループ  
     steps:
@@ -75,14 +75,13 @@ jobs:
       id: validate-check
       run: |
         terraform validate > test.txt
-        echo 'test=cat test.txt' >> $GITHUB_OUTPUT
     
     #構文チェックに失敗したことを通知
     - name: 'Failure Validate'
       if: failure() && steps.validate-check.outcome == 'failure'
       run: |
         echo 'terraform syntax check failed'
-        echo ${{needs.terraform.outputs.output1}}
+        echo 'cat test.txt'
       
     #構文チェックが成功したらドライランを実行
     - name: 'Terraform Plan'
