@@ -90,7 +90,7 @@ jobs:
         time=$(date '+%Y/%m/%d_%H:%M:%S')
         echo $time
         cat result-validate.txt
-        terraform plan > result-plan.txt
+        terraform plan > result-plan-$time.txt
         cat result-plan.txt
     
     # アーティファクトアップロード
@@ -111,18 +111,8 @@ jobs:
       
       - name: 'Checkout'
         uses: actions/checkout@v2
-      
-      - name: 'Cache Dependency'
-        id: cache-awscli
-        uses: actions/cache@v3
-        with:
-          path: |
-            '**/aws'
-            '**/.aws'
-          key: awscli-${{ hashFiles('**/.terraform.lock.hcl') }}
         
       - name: 'AWS CLI Install'
-        if: steps.cache-awscli.outputs.cache-hit != 'true'
         run: sudo apt install -y awscli
       
       - name: 'Download Artifact'
