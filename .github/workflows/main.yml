@@ -87,7 +87,7 @@ jobs:
       if: steps.validate-check.outcome == 'success'
       run: |
         time=$(date "+%F")
-        cat $time
+        echo $time
         cat result-validate.txt
         terraform plan > result-plan.txt
         cat result-plan.txt
