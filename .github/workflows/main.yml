@@ -71,7 +71,7 @@ jobs:
     - name: 'Terraform Validate'
       id: validate-check
       run: |
-        terraform validate  >> test.txt
+        terraform validate > test.txt
         cat test.txt 
     
     #構文チェックに失敗したことを通知
