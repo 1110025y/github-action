@@ -70,7 +70,9 @@ jobs:
     #Terraformの構文チェック
     - name: 'Terraform Validate'
       id: validate-check
-      run: terraform validate
+      run: |
+        i = terraform validate
+        echo '${i}'
     
     #構文チェックに失敗したことを通知
     - name: 'Failure Validate'
