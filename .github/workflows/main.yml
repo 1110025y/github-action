@@ -83,7 +83,7 @@ jobs:
         echo 'terraform syntax check failed'
         cat result-validate.txt
       
-    #構文チェックが成功したらドライランを実行
+    #日付取得
     - name: 'DATA'
       id: api
       run: |
@@ -138,5 +138,5 @@ jobs:
       - name: 'Upload to S3'
         run: |
           aws --version
-          aws s3 cp ${{ steps.api.outputs.data }}-result-plan.txt ${{ env.S3_PATH }}
+          aws s3 cp ${{ needs.terraform.outputs.data }}-result-plan.txt ${{ env.S3_PATH }}
           
