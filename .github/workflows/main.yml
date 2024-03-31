@@ -18,6 +18,7 @@ env:
   TF_VERSION: 1.7.5
   AWS_ROLE_ARN: ${{secrets.AWS_ROLE_ARN}}
   S3_PATH: ${{secrets.S3_PATH}}
+  TIME: $(date +'%Y-%m')
     
  #ワークフロー内のジョブグループ      
 jobs:
@@ -87,18 +88,17 @@ jobs:
     - name: 'Terraform Plan'
       if: steps.validate-check.outcome == 'success'
       run: |
-        time=$(date +'%Y-%m')
-        echo $time
+        echo ${{ env.TIME }}
         cat result-validate.txt
-        terraform plan > $time-result-plan.json
-        cat $time-result-plan.json
+        terraform plan > ${{ env.TIME }}-result-plan.json
+        cat ${{ env.TIME }}-result-plan.json
     
     # アーティファクトアップロード
     - name: 'Upload Artifact'
       uses: actions/upload-artifact@v4
       with:
         name: my-artifact
-        path: $time-result-plan.json
+        path: ${{ env.TIME }}-result-plan.json
 
 
   # upload-to-s3:
