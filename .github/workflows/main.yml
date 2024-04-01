@@ -120,13 +120,14 @@ jobs:
       id: apply
       run: |
         echo 'Apply'
+        terraform plan -no-color 
 
     ## applyの結果を環境変数に格納
     - name: truncate terraform apply result
       if: github.event_name == 'pull_request'
       run: |
         echo 'result=Apply Result' >> $GITHUB_ENV
-        echo '${{ steps.apply.outputs.stdout }}' | grep "Apply complete!" >> $GITHUB_ENV
+        echo '${{ steps.apply.outputs.stdout }}' | grep -e "No changes." -e "Plan:" >> $GITHUB_ENV
         echo "${{ env.result }}"
           
 
