@@ -3,9 +3,9 @@ name: Terraform Github Actions
 on:
   workflow_dispatch:
   push:
-    branches: [ main, develop ]
+    branches-ignore:
+      - main
   pull_request:
-    # The branches below must be a subset of the branches above
     branches: [ main ]
   
 #ジョブの権限設定
@@ -31,6 +31,7 @@ jobs:
     #ジョブ実行するマシンのタイプ
     runs-on: ubuntu-latest
     
+    #
     outputs:
       data: ${{ steps.get-data.outputs.data }}
     
@@ -45,7 +46,6 @@ jobs:
     #キャッシュを取得
     - name: 'Cache Dependency'
       id: cache-init
-      if: github.event_name == 'push'
       uses: actions/cache@v3
       with:
         path: '**/.terraform'
@@ -74,13 +74,13 @@ jobs:
     
     #Terraformの構文チェック
     - name: 'Terraform Validate'
-      id: validate-check
+      id: validate
       if: github.event_name == 'push'
       run: terraform validate > result-validate.txt
     
     #構文チェックに失敗したことを通知
     - name: 'Failure Validate'
-      if: failure() && steps.validate-check.outcome == 'failure'
+      if: failure() && steps.validate.outcome == 'failure'
       run: |
         echo 'terraform syntax check failed'
         cat result-validate.txt
@@ -100,7 +100,15 @@ jobs:
       run: |
         cat result-validate.txt
         terraform plan -no-color > ${{ steps.get-data.outputs.data }}-result-plan.txt
-        cat ${{ steps.get-data.outputs.data }}-result-plan.txt
+        #cat ${{ steps.get-data.outputs.data }}-result-plan.txt
+    
+    #planの結果を環境変数に格納
+    - name: truncate terraform plan result
+      run: |
+        echo 'plan_result<> $GITHUB_ENV
+        echo '${{ steps.plan.outputs.stdout }}' >> $GITHUB_ENV
+        echo 'EOF' >> $GITHUB_ENV
+        echo "${{ env.plan_result }}"
     
     # アーティファクトアップロード
     - name: 'Upload Artifact'
