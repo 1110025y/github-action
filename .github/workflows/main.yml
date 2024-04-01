@@ -76,14 +76,17 @@ jobs:
     - name: 'Terraform Validate'
       id: validate
       if: github.event_name == 'push'
-      run: terraform validate > result-validate.txt
+      run: |
+        t=$(terraform validate)
+        echo "a=$t" >> $GITHUB_ENV
     
     #構文チェックに失敗したことを通知
     - name: 'Failure Validate'
       if: failure() && steps.validate.outcome == 'failure'
       run: |
         echo 'terraform syntax check failed'
-        cat result-validate.txt
+        echo "${{ env.a }}"
+        #cat result-validate.txt
       
     #日付取得
     - name: 'DATA'
@@ -100,15 +103,7 @@ jobs:
       run: |
         cat result-validate.txt
         terraform plan -no-color > ${{ steps.get-data.outputs.data }}-result-plan.txt
-        #cat ${{ steps.get-data.outputs.data }}-result-plan.txt
-    
-    #planの結果を環境変数に格納
-    - name: truncate terraform plan result
-      run: |
-        echo "action=plan_result" >> $GITHUB_ENV
-        echo '${{ steps.plan.outputs.stdout }}' >> $GITHUB_ENV
-        echo 'EOF' >> $GITHUB_ENV
-        echo "${{ env.action }}"
+        cat ${{ steps.get-data.outputs.data }}-result-plan.txt
     
     # アーティファクトアップロード
     - name: 'Upload Artifact'
