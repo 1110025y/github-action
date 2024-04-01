@@ -87,7 +87,7 @@ jobs:
     - name: 'DATA'
       id: get-data
       run: |
-        data=$(date +'%Y%m%d_%H:%M:%S')
+        data=$(date +'%Y%m%d-%H%M%S')
         echo "data=$data" >> $GITHUB_OUTPUT
         
     #構文チェックが成功したらドライランを実行
