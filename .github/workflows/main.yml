@@ -96,14 +96,9 @@ jobs:
       id: plan
       run: |
         cat result-validate.txt
-        terraform plan -no-color
-        
-    #出力
-    - name: 'RESULT OUTPUT'
-      run: |
-        ${{ steps.plan.outputs.stdout }} > ${{ steps.get-data.outputs.data }}-result-plan.txt
+        terraform plan -no-color > ${{ steps.get-data.outputs.data }}-result-plan.txt
         ls
-        #cat $output > ${{ steps.get-data.outputs.data }}-result-plan.txt
+        ${{ steps.plan.outputs.stdout }}
     
     # アーティファクトアップロード
     - name: 'Upload Artifact'
@@ -114,36 +109,36 @@ jobs:
           ${{ steps.get-data.outputs.data }}-result-plan.txt
 
 
-  # upload-to-s3:
+  upload-to-s3:
   
-  #   name: 'UPLOAD TO S3'
-  #   runs-on: ubuntu-latest
-  #   needs: terraform
+    name: 'UPLOAD TO S3'
+    runs-on: ubuntu-latest
+    needs: terraform
     
-  #   steps:
+    steps:
       
-  #     - name: 'Checkout'
-  #       uses: actions/checkout@v2
+      - name: 'Checkout'
+        uses: actions/checkout@v2
         
-  #     - name: 'AWS CLI Install'
-  #       run: sudo apt install -y awscli
+      - name: 'AWS CLI Install'
+        run: sudo apt install -y awscli
       
-  #     - name: 'Download Artifact'
-  #       uses: actions/download-artifact@v4
-  #       with:
-  #         name: my-artifact
+      - name: 'Download Artifact'
+        uses: actions/download-artifact@v4
+        with:
+          name: my-artifact
 
-  #     - name: 'Configure AWS Credentials'
-  #       uses: aws-actions/configure-aws-credentials@v4
-  #       with:
-  #         role-to-assume: ${{ env.AWS_ROLE_ARN }}
-  #         aws-region: ${{ env.AWS_REGION }}
+      - name: 'Configure AWS Credentials'
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ env.AWS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
           
-  #     - name: 'Confirm Artifact'
-  #       run: ls -la
+      - name: 'Confirm Artifact'
+        run: ls -la
 
-  #     - name: 'Upload to S3'
-  #       run: |
-  #         aws --version
-  #         aws s3 cp ${{ needs.terraform.outputs.data }}-result-plan.txt ${{ env.S3_PATH }}
+      - name: 'Upload to S3'
+        run: |
+          aws --version
+          aws s3 cp ${{ needs.terraform.outputs.data }}-result-plan.txt ${{ env.S3_PATH }}
           
