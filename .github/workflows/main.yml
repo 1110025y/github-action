@@ -3,12 +3,15 @@ name: Terraform Github Actions
 on:
   workflow_dispatch:
   push:
-    branches: [ main ]
+    branches-ignore:
+      - main
   pull_request:
-    # The branches below must be a subset of the branches above
-    branches: [ main ]
+    branches:
+      - main
+    types:
+      - closed
   
-#ジョブの権限設定
+##ジョブの権限設定
 permissions:
   id-token: write
   contents: read
@@ -19,30 +22,31 @@ env:
   AWS_ROLE_ARN: ${{secrets.AWS_ROLE_ARN}}
   S3_PATH: ${{secrets.S3_PATH}}
     
- #ワークフロー内のジョブグループ      
+ ##ワークフロー内のジョブグループ      
 jobs:
 
-  #ジョブID
+  ##ジョブID
   terraform:
 
-    #ジョブ名
+    ##ジョブ名
     name: Terraform Setup
 
-    #ジョブ実行するマシンのタイプ
+    ##ジョブ実行するマシンのタイプ
     runs-on: ubuntu-latest
     
+    ## 
     outputs:
-      data: ${{ steps.api.outputs.data }}
+      data: ${{ steps.get-data.outputs.data }}
     
-    #タスクのグループ  
+    ##タスクのグループ  
     steps:
 
-    #GitHubの公式アクション、CI/CDを実行するサーバへチェックアウト
-    #https://github.com/actions/checkout
+    ## GitHubの公式アクション、CI/CDを実行するサーバへチェックアウト
+    ## https://github.com/actions/checkout
     - name: 'Checkout'
       uses: actions/checkout@master
       
-    #キャッシュを取得
+    ##キャッシュを取得
     - name: 'Cache Dependency'
       id: cache-init
       uses: actions/cache@v3
@@ -50,68 +54,88 @@ jobs:
         path: '**/.terraform'
         key: init-${{ hashFiles('**/.terraform.lock.hcl') }}
 
-    #AWS公式のアクション、AWSへの認証
-    #https://github.com/aws-actions/configure-aws-credentials
+    ## AWS公式のアクション、AWSへの認証
+    ## https://github.com/aws-actions/configure-aws-credentials
     - name: 'Configure AWS Credentials'
       uses: aws-actions/configure-aws-credentials@v4
       with:
         role-to-assume: ${{ env.AWS_ROLE_ARN }}
         aws-region: ${{ env.AWS_REGION }}
  
-    #hashicorpの公式のアクション
-    #https://github.com/hashicorp/setup-terraform
+    ## hashicorpの公式のアクション
+    ## https://github.com/hashicorp/setup-terraform
     - name: 'Setup Terraform'
       uses: hashicorp/setup-terraform@v2
       with:
         terraform_version: ${{ env.TF_VERSION }}
  
-    #ワークスペースの初期化
-    #取得したキャッシュがあった場合はスキップする
+    ## ワークスペースの初期化
+    ## 取得したキャッシュがあった場合はスキップする
     - name: 'Terraform Init'
       if: steps.cache-init.outputs.cache-hit != 'true'
       run: terraform init -upgrade
     
-    #Terraformの構文チェック
+    ##Terraformの構文チェック
     - name: 'Terraform Validate'
-      id: validate-check
+      id: validate
+      if: github.event_name == 'push'
       run: terraform validate > result-validate.txt
     
-    #構文チェックに失敗したことを通知
+    ##構文チェックに失敗したことを通知
     - name: 'Failure Validate'
-      if: failure() && steps.validate-check.outcome == 'failure'
+      if: failure() && steps.validate.outcome == 'failure'
       run: |
         echo 'terraform syntax check failed'
         cat result-validate.txt
       
-    #日付取得
+    ##日付取得
     - name: 'DATA'
-      id: api
+      id: get-data
+      if: github.event_name == 'push'
       run: |
-        data=$(date +'%Y-%m')
+        data=$(date +'%Y%m%d-%H%M%S')
         echo "data=$data" >> $GITHUB_OUTPUT
         
-    #構文チェックが成功したらドライランを実行
+    ##構文チェックが成功したらドライランを実行
     - name: 'Terraform Plan'
-      if: steps.validate-check.outcome == 'success'
+      if: steps.validate.outcome == 'success' && github.event_name == 'push'
+      id: plan
       run: |
         cat result-validate.txt
-        terraform plan > ${{ steps.api.outputs.data }}-result-plan.txt
-        cat ${{ steps.api.outputs.data }}-result-plan.txt
-        
-    # アーティファクトアップロード
+        terraform plan -no-color > ${{ steps.get-data.outputs.data }}-result-plan.txt
+        cat ${{ steps.get-data.outputs.data }}-result-plan.txt
+    
+    ##アーティファクトアップロード
     - name: 'Upload Artifact'
+      if: github.event_name == 'push'
       uses: actions/upload-artifact@v4
       with:
         name: my-artifact
         path: |
-          ${{ steps.api.outputs.data }}-result-plan.txt
+          ${{ steps.get-data.outputs.data }}-result-plan.txt
+          
+    ## AWSデプロイ
+    - name: 'Terraform Apply'
+      if: github.event_name == 'pull_request'
+      id: apply
+      run: |
+        echo 'Apply'
 
+    ## applyの結果を環境変数に格納
+    - name: truncate terraform apply result
+      if: github.event_name == 'pull_request'
+      run: |
+        echo 'result=Apply Result' >> $GITHUB_ENV
+        echo '${{ steps.apply.outputs.stdout }}' | grep "Apply complete!" >> $GITHUB_ENV
+        echo "${{ env.result }}"
+          
 
   upload-to-s3:
   
     name: 'UPLOAD TO S3'
     runs-on: ubuntu-latest
     needs: terraform
+    if: github.event_name == 'push'
     
     steps:
       
@@ -139,4 +163,5 @@ jobs:
         run: |
           aws --version
           aws s3 cp ${{ needs.terraform.outputs.data }}-result-plan.txt ${{ env.S3_PATH }}
+          
           
