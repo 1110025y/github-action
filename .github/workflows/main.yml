@@ -109,12 +109,12 @@ jobs:
     
     #      
     - name: 'AWS CLI Install'
-        run: sudo apt install -y awscli
+      run: sudo apt install -y awscli
         
     - name: 'Upload to S3'
-        run: |
-          aws --version
-          aws s3 cp ${{ needs.terraform.outputs.data }}-result-plan.txt ${{ env.S3_PATH }}
+      run: |
+        aws --version
+        aws s3 cp ${{ needs.terraform.outputs.data }}-result-plan.txt ${{ env.S3_PATH }}
 
 
   # upload-to-s3:
