@@ -102,7 +102,8 @@ jobs:
     - name: 'RESULT OUTPUT'
       run: |
         ${{ steps.plan.outputs.stdout }} > ${{ steps.get-data.outputs.data }}-result-plan.txt
-        cat $output > ${{ steps.get-data.outputs.data }}-result-plan.txt
+        ls
+        #cat $output > ${{ steps.get-data.outputs.data }}-result-plan.txt
     
     # アーティファクトアップロード
     - name: 'Upload Artifact'
