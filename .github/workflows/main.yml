@@ -96,13 +96,13 @@ jobs:
       id: plan
       run: |
         cat result-validate.txt
-        terraform plan
+        terraform plan -no-color
         #cat ${{ steps.get-data.outputs.data }}-result-plan.txt
         
     #出力
     - name: 'Plan'
       run: |
-        echo ${{ steps.plan.outcome }} > ${{ steps.api.outputs.data }}-result-plan.txt
+        echo ${{ steps.plan.outputs.stdout }} > ${{ steps.api.outputs.data }}-result-plan.txt
         cat ${{ steps.api.outputs.data }}-result-plan.txt
     
     # アーティファクトアップロード
