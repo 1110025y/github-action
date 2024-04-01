@@ -134,8 +134,11 @@ jobs:
       - name: 'Checkout'
         uses: actions/checkout@v2
         
-      # - name: 'AWS CLI Install'
-      #   run: sudo apt install -y awscli
+      - name: 'AWS CLI Install'
+        run: |
+          #sudo apt install -y awscli
+          aws --version
+        
       
       - name: 'Download Artifact'
         uses: actions/download-artifact@v4
