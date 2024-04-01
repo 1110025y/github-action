@@ -101,7 +101,7 @@ jobs:
     #出力
     - name: 'RESULT OUTPUT'
       run: |
-        output=${{ steps.plan.outputs.stdout }}
+        output=`${{ steps.plan.outputs.stdout }}`
         cat $output > ${{ steps.get-data.outputs.data }}-result-plan.txt
     
     # アーティファクトアップロード
