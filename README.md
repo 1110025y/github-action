@@ -27,7 +27,10 @@ git reset --soft HEAD^
             "Condition": {
                 "StringEquals": {
                     "token.actions.githubusercontent.com:aud": "sts.amazonaws.com",
-                    "token.actions.githubusercontent.com:sub": "repo:1110025y/github-action:ref:refs/heads/main"
+                    "token.actions.githubusercontent.com:sub": [
+                        "repo:1110025y/github-action:ref:refs/heads/main",
+                        "repo:1110025y/github-action:ref:refs/heads/develop"
+                    ],
                 }
             }
         }

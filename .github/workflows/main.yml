@@ -32,7 +32,7 @@ jobs:
     runs-on: ubuntu-latest
     
     outputs:
-      data: ${{ steps.api.outputs.data }}
+      data: ${{ steps.get-data.outputs.data }}
     
     #タスクのグループ  
     steps:
@@ -85,19 +85,25 @@ jobs:
       
     #日付取得
     - name: 'DATA'
-      id: api
+      id: get-data
       run: |
-        data=$(date +'%Y-%m')
+        data=$(date +'+%Y/%m/%d/%H:%M:%S')
         echo "data=$data" >> $GITHUB_OUTPUT
         
     #構文チェックが成功したらドライランを実行
     - name: 'Terraform Plan'
       if: steps.validate-check.outcome == 'success'
+      id: plan
       run: |
         cat result-validate.txt
         terraform plan > ${{ steps.api.outputs.data }}-result-plan.txt
         cat ${{ steps.api.outputs.data }}-result-plan.txt
-        
+    
+     - name: 'Plan'
+      run: |
+        ${{ steps.plan.outcome }} > ${{ steps.api.outputs.data }}-result-plan.txt
+        cat ${{ steps.api.outputs.data }}-result-plan.txt
+    
     # アーティファクトアップロード
     - name: 'Upload Artifact'
       uses: actions/upload-artifact@v4
