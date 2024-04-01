@@ -96,14 +96,14 @@ jobs:
       id: plan
       run: |
         cat result-validate.txt
-        terraform plan > ${{ steps.api.outputs.data }}-result-plan.txt
-        cat ${{ steps.api.outputs.data }}-result-plan.txt
+        terraform plan
+        #cat ${{ steps.get-data.outputs.data }}-result-plan.txt
         
-    #
-    # - name: 'Plan'
-    #   run: |
-    #     ${{ steps.plan.outcome }} > ${{ steps.api.outputs.data }}-result-plan.txt
-    #     cat ${{ steps.api.outputs.data }}-result-plan.txt
+    #出力
+    - name: 'Plan'
+      run: |
+        echo ${{ steps.plan.outcome }} > ${{ steps.api.outputs.data }}-result-plan.txt
+        cat ${{ steps.api.outputs.data }}-result-plan.txt
     
     # アーティファクトアップロード
     - name: 'Upload Artifact'
