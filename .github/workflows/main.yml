@@ -45,6 +45,7 @@ jobs:
     #キャッシュを取得
     - name: 'Cache Dependency'
       id: cache-init
+      if: github.event_name == 'push'
       uses: actions/cache@v3
       with:
         path: '**/.terraform'
@@ -74,6 +75,7 @@ jobs:
     #Terraformの構文チェック
     - name: 'Terraform Validate'
       id: validate-check
+      if: github.event_name == 'push'
       run: terraform validate > result-validate.txt
     
     #構文チェックに失敗したことを通知
@@ -86,6 +88,7 @@ jobs:
     #日付取得
     - name: 'DATA'
       id: get-data
+      if: github.event_name == 'push'
       run: |
         data=$(date +'%Y%m%d-%H%M%S')
         echo "data=$data" >> $GITHUB_OUTPUT
@@ -101,21 +104,13 @@ jobs:
     
     # アーティファクトアップロード
     - name: 'Upload Artifact'
+      if: github.event_name == 'push'
       uses: actions/upload-artifact@v4
       with:
         name: my-artifact
         path: |
           ${{ steps.get-data.outputs.data }}-result-plan.txt
-    
-    #      
-    - name: 'AWS CLI Install'
-      run: sudo apt install -y awscli
-        
-    - name: 'Upload to S3'
-      run: |
-        aws --version
-        aws s3 cp ${{ steps.get-data.outputs.data }}-result-plan.txt ${{ env.S3_PATH }}
-
+          
 
   # upload-to-s3:
   
