@@ -77,7 +77,7 @@ jobs:
       id: validate
       if: github.event_name == 'push'
       run: |
-        t=$(terraform validate)
+        t=terraform validate
         echo "a=$t" >> $GITHUB_ENV
     
     #構文チェックに失敗したことを通知
