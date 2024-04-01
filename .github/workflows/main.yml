@@ -98,7 +98,7 @@ jobs:
         cat result-validate.txt
         terraform plan -no-color > ${{ steps.get-data.outputs.data }}-result-plan.txt
         ls
-        ${{ steps.plan.outputs.stdout }}
+        #${{ steps.plan.outputs.stdout }}
     
     # アーティファクトアップロード
     - name: 'Upload Artifact'
