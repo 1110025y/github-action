@@ -101,9 +101,9 @@ jobs:
     
     #
      - name: 'Plan'
-      run: |
-        ${{ steps.plan.outcome }} > ${{ steps.api.outputs.data }}-result-plan.txt
-        cat ${{ steps.api.outputs.data }}-result-plan.txt
+       run: |
+         ${{ steps.plan.outcome }} > ${{ steps.api.outputs.data }}-result-plan.txt
+         cat ${{ steps.api.outputs.data }}-result-plan.txt
     
     # アーティファクトアップロード
     - name: 'Upload Artifact'
