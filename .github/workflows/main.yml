@@ -97,13 +97,12 @@ jobs:
       run: |
         cat result-validate.txt
         terraform plan -no-color
-        #cat ${{ steps.get-data.outputs.data }}-result-plan.txt
         
     #出力
-    - name: 'Plan'
+    - name: 'RESULT OUTPUT'
       run: |
-        echo ${{ steps.plan.outputs.stdout }} > ${{ steps.api.outputs.data }}-result-plan.txt
-        cat ${{ steps.api.outputs.data }}-result-plan.txt
+        echo ${{ steps.plan.outputs.stdout }} > ${{ steps.get-data.outputs.data }}-result-plan.txt
+        cat ${{ steps.get-data.outputs.data }}-result-plan.txt
     
     # アーティファクトアップロード
     - name: 'Upload Artifact'
@@ -111,7 +110,7 @@ jobs:
       with:
         name: my-artifact
         path: |
-          ${{ steps.api.outputs.data }}-result-plan.txt
+          ${{ steps.get-data.outputs.data }}-result-plan.txt
 
 
   upload-to-s3:
