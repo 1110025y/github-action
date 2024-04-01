@@ -95,7 +95,7 @@ jobs:
         
     #構文チェックが成功したらドライランを実行
     - name: 'Terraform Plan'
-      if: steps.validate-check.outcome == 'success'
+      if: steps.validate.outcome == 'success'
       id: plan
       run: |
         cat result-validate.txt
@@ -105,10 +105,10 @@ jobs:
     #planの結果を環境変数に格納
     - name: truncate terraform plan result
       run: |
-        echo 'plan_result<> $GITHUB_ENV
+        echo "action=plan_result" >> $GITHUB_ENV
         echo '${{ steps.plan.outputs.stdout }}' >> $GITHUB_ENV
         echo 'EOF' >> $GITHUB_ENV
-        echo "${{ env.plan_result }}"
+        echo "${{ env.action }}"
     
     # アーティファクトアップロード
     - name: 'Upload Artifact'
