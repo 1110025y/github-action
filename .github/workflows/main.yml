@@ -114,20 +114,20 @@ jobs:
         path: |
           ${{ steps.get-data.outputs.data }}-result-plan.txt
           
-     ## AWSデプロイ
-      - name: 'Terraform Apply'
-        if: github.event_name == 'pull_request'
-        id: apply
-        run: |
-          echo 'Apply'
+    ## AWSデプロイ
+    - name: 'Terraform Apply'
+      if: github.event_name == 'pull_request'
+      id: apply
+      run: |
+        echo 'Apply'
 
-      ## applyの結果を環境変数に格納
-      - name: truncate terraform apply result
-        if: github.event_name == 'pull_request'
-        run: |
-          echo 'result=Apply Result' >> $GITHUB_ENV
-          echo '${{ steps.apply.outputs.stdout }}' | grep "Apply complete!" >> $GITHUB_ENV
-          echo "${{ env.result }}"
+    ## applyの結果を環境変数に格納
+    - name: truncate terraform apply result
+      if: github.event_name == 'pull_request'
+      run: |
+        echo 'result=Apply Result' >> $GITHUB_ENV
+        echo '${{ steps.apply.outputs.stdout }}' | grep "Apply complete!" >> $GITHUB_ENV
+        echo "${{ env.result }}"
           
 
   upload-to-s3:
