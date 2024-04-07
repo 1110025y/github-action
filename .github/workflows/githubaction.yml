@@ -112,7 +112,12 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         tfsec --version
-      
+    
+    # TFsecの実行
+    - name: 'Run Tfsec'
+      run: |
+        tfsec --version
+    
     ##日付取得
     - name: 'DATA'
       id: get-data
