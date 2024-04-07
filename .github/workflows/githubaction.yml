@@ -111,9 +111,9 @@ jobs:
       # with:
       #   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       #   working_directory: .tfsec/
-      run: |
-        tfsec --version
-        #tfsec --config-file .tfsec/config.yml 
+      uses: aquasecurity/tfsec-action@v1.0.0
+      with:
+        working_directory: .tfsec/
 
     ##日付取得
     - name: 'DATA'
