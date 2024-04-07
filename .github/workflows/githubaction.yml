@@ -108,8 +108,8 @@ jobs:
     # TFsecのインストール
     - name: 'Terraform Security Scan'
       uses: tfsec/tfsec-pr-commenter-action@main
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # env:
+      #   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     
     # TFsecの実行
     - name: 'Run Tfsec'
