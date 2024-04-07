@@ -87,6 +87,23 @@ jobs:
       run: |
         echo 'terraform syntax check failed'
         cat result-validate.txt
+        
+    # TFLintのインストール
+    - name: 'Setup TFLint'
+      if: github.event_name == 'push'
+      uses: terraform-linters/setup-tflint@v4
+      with:
+        tflint_version: v0.50.3
+        
+    # TFLintのプラグインのインストール
+    - name: 'Init TFLint'
+      if: github.event_name == 'push'
+      run: tflint --init
+      
+    # TFLintの実行
+    - name: 'Run TFLint'
+      if: github.event_name == 'push'
+      run: tflint --recursive -c $(pwd)/.tflint.hcl
       
     ##日付取得
     - name: 'DATA'
@@ -116,7 +133,7 @@ jobs:
           
     ## AWSデプロイ
     - name: 'Terraform Apply'
-      if: github.event_name == 'pull_request'
+      if: github.event.pull_request.merged == true
       id: apply
       run: |
         echo 'Apply SUCCESS'

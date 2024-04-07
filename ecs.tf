@@ -87,7 +87,7 @@ resource "aws_ecs_service" "service" {
       aws_subnet.public[0].id,
       aws_subnet.public[1].id
     ]
-    security_groups = ["${aws_security_group.ecs_sg.id}"]
+    security_groups = [aws_security_group.ecs_sg.id]
 
     // publicIP付与　publicに配置する場合は必要
     assign_public_ip = "true"

@@ -31,8 +31,14 @@ variable "project_name" {
   type = map(any)
 }
 
-variable "availability_zones" {}
+variable "availability_zones" {
+  type = list(any)
+}
 
-variable "zones" {}
+variable "zones" {
+  type = list(any)
+}
 
-variable "alarm_config" {}
+variable "alarm_config" {
+  type = map(string)
+}
