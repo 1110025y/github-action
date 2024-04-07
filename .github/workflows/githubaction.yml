@@ -110,8 +110,6 @@ jobs:
       uses: tfsec/tfsec-pr-commenter-action@main
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: |
-        tfsec --version
     
     # TFsecの実行
     - name: 'Run Tfsec'
