@@ -117,6 +117,7 @@ jobs:
       id: get-data
       if: github.event_name == 'push'
       run: |
+        ls
         data=$(date +'%Y%m%d-%H%M%S')
         echo "data=$data" >> $GITHUB_OUTPUT
         
@@ -146,39 +147,39 @@ jobs:
         echo 'Apply SUCCESS'
           
           
-  upload-to-s3:
+  # upload-to-s3:
   
-    name: 'UPLOAD TO S3'
-    runs-on: ubuntu-latest
-    needs: terraform
-    if: github.event_name == 'push'
+  #   name: 'UPLOAD TO S3'
+  #   runs-on: ubuntu-latest
+  #   needs: terraform
+  #   if: github.event_name == 'push'
     
-    steps:
+  #   steps:
       
-      - name: 'Checkout'
-        uses: actions/checkout@v2
+  #     - name: 'Checkout'
+  #       uses: actions/checkout@v2
         
-      - name: 'AWS CLI Install'
-        run: |
-          #sudo apt install -y awscli
-          aws --version
+  #     - name: 'AWS CLI Install'
+  #       run: |
+  #         #sudo apt install -y awscli
+  #         aws --version
       
-      - name: 'Download Artifact'
-        uses: actions/download-artifact@v4
-        with:
-          name: my-artifact
+  #     - name: 'Download Artifact'
+  #       uses: actions/download-artifact@v4
+  #       with:
+  #         name: my-artifact
 
-      - name: 'Configure AWS Credentials'
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          role-to-assume: ${{ env.AWS_ROLE_ARN }}
-          aws-region: ${{ env.AWS_REGION }}
+  #     - name: 'Configure AWS Credentials'
+  #       uses: aws-actions/configure-aws-credentials@v4
+  #       with:
+  #         role-to-assume: ${{ env.AWS_ROLE_ARN }}
+  #         aws-region: ${{ env.AWS_REGION }}
           
-      - name: 'Confirm Artifact'
-        run: ls -la
+  #     - name: 'Confirm Artifact'
+  #       run: ls -la
 
-      - name: 'Upload to S3'
-        run: |
-          aws s3 cp ${{ needs.terraform.outputs.data }}-result-plan.txt ${{ env.S3_PATH }}
+  #     - name: 'Upload to S3'
+  #       run: |
+  #         aws s3 cp ${{ needs.terraform.outputs.data }}-result-plan.txt ${{ env.S3_PATH }}
           
           
