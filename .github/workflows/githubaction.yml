@@ -129,8 +129,8 @@ jobs:
       #   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       #   working_directory: .tfsec/
       uses: aquasecurity/tfsec-action@v1.0.0
-      with:
-        working_directory: .tfsec/
+      # with:
+      #   working_directory: .tfsec/
     
     
     ##アーティファクトアップロード
