@@ -104,16 +104,6 @@ jobs:
     - name: 'Run TFLint'
       if: github.event_name == 'push'
       run: tflint --recursive -c $(pwd)/.tflint.hcl
-      
-    # TFsecの実行
-    - name: 'Terraform Security Scan'
-      # uses: tfsec/tfsec-pr-commenter-action@main
-      # with:
-      #   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      #   working_directory: .tfsec/
-      uses: aquasecurity/tfsec-action@v1.0.0
-      with:
-        working_directory: .tfsec/
 
     ##日付取得
     - name: 'DATA'
@@ -131,6 +121,17 @@ jobs:
         cat result-validate.txt
         terraform plan -no-color > ${{ steps.get-data.outputs.data }}-result-plan.txt
         cat ${{ steps.get-data.outputs.data }}-result-plan.txt
+    
+    # TFsecの実行
+    - name: 'Terraform Security Scan'
+      # uses: tfsec/tfsec-pr-commenter-action@main
+      # with:
+      #   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #   working_directory: .tfsec/
+      uses: aquasecurity/tfsec-action@v1.0.0
+      with:
+        working_directory: .tfsec/
+    
     
     ##アーティファクトアップロード
     - name: 'Upload Artifact'
