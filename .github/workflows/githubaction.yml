@@ -107,17 +107,19 @@ jobs:
       
     # TFsecの実行
     - name: 'Terraform Security Scan'
-      uses: tfsec/tfsec-pr-commenter-action@main
-      with:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        working_directory: .tfsec/
+      # uses: tfsec/tfsec-pr-commenter-action@main
+      # with:
+      #   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #   working_directory: .tfsec/
+      uses: triat/terraform-security-scan@v3.0.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     
     ##日付取得
     - name: 'DATA'
       id: get-data
       if: github.event_name == 'push'
       run: |
-        cat results.json
         data=$(date +'%Y%m%d-%H%M%S')
         echo "data=$data" >> $GITHUB_OUTPUT
         
