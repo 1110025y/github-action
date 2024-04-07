@@ -112,15 +112,9 @@ jobs:
       #   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       #   working_directory: .tfsec/
       run: |
-        curl -L "$(curl -s https://api.github.com/repos/tfsec/tfsec/releases/latest | grep -o -E "https://.+tfsec-linux-amd64")" -o tfsec
-        ls
-        chmod +x tfsec
-        sudo mv tfsec /usr/local/bin/tfsec
-    
-    #  
-    - name: Run TFSec
-      run: tfsec --version
-    
+        tfsec --version
+        #tfsec --config-file .tfsec/config.yml 
+
     ##日付取得
     - name: 'DATA'
       id: get-data
