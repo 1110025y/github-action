@@ -112,8 +112,8 @@ jobs:
       #   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       #   working_directory: .tfsec/
       uses: triat/terraform-security-scan@v3.0.0
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     
     ##日付取得
     - name: 'DATA'
