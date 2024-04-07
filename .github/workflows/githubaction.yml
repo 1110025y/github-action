@@ -117,7 +117,7 @@ jobs:
       id: get-data
       if: github.event_name == 'push'
       run: |
-        ls
+        cat results.json
         data=$(date +'%Y%m%d-%H%M%S')
         echo "data=$data" >> $GITHUB_OUTPUT
         
