@@ -1,0 +1,4 @@
+minimum_severity: HIGH
+
+exclude:
+  - aws-ec2-add-description-to-security-group-rule

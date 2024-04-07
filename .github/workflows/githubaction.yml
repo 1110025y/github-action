@@ -105,6 +105,14 @@ jobs:
       if: github.event_name == 'push'
       run: tflint --recursive -c $(pwd)/.tflint.hcl
       
+    # TFsecのインストール
+    - name: 'Terraform Security Scan'
+      uses: tfsec/tfsec-pr-commenter-action@main
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        tfsec --version
+      
     ##日付取得
     - name: 'DATA'
       id: get-data
