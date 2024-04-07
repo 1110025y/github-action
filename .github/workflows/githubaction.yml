@@ -110,7 +110,7 @@ jobs:
       uses: tfsec/tfsec-pr-commenter-action@main
       with:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        working_directory: tfsec/config.yml
+        working_directory: .tfsec/
     
     ##日付取得
     - name: 'DATA'
