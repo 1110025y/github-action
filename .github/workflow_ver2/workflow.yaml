@@ -1,0 +1,67 @@
+on:
+  workflow_call:
+    inputs:
+      deploy_environment:
+        required: false
+        type: string
+      deploy_environment_matrix:
+        required: false
+        type: string
+    secrets:
+      AWS_GITHUB_ACTIONS_ROLE_ARN:
+        required: true
+
+jobs:
+  MainJob:
+    runs-on: ubuntu-latest
+    name: Process lambda code deploy
+
+    permissions:
+      id-token: write
+      contents: read
+
+    env:
+      AWS_REGION: ap-northeast-1
+
+    strategy:
+      matrix:
+        dir: ${{ fromJson(inputs.deploy_environment_matrix) }}
+    
+    steps:    
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      # - name: Set Changed Directories
+      #   run: |
+      #     echo "Deploy Environment Matrix：${{ inputs.deploy_environment_matrix }}" >> $GITHUB_STEP_SUMMARY
+      
+      - name: Resource name ceack
+        run: |
+          echo "Lambda Name Ceack: test-kjm-csimulator-${{ inputs.deploy_environment }}-${{ matrix.dir }}" >> $GITHUB_STEP_SUMMARY
+
+      - name: 'Configure AWS Credentials'
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_GITHUB_ACTIONS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }} 
+
+      - name: List directory contents
+        run: |
+          ls -la
+          cd ${{ matrix.dir }}
+          ls -la
+
+      - name: Zip Lambda function code
+        run: |
+          cd ${{ matrix.dir }}/app
+          zip -r lambda-package.zip .
+          ls -la
+
+      - name: Deploy to Lambda
+        run: |
+          cd ${{ matrix.dir }}/app
+          aws lambda update-function-code \
+            --function-name "test-kjm-csimulator-${{ inputs.deploy_environment }}-${{ matrix.dir }}" \
+            --zip-file fileb://lambda-package.zip
+
+     

@@ -1,0 +1,44 @@
+on:
+  workflow_call:
+    inputs:
+      deploy_environment_matrix:
+        required: false
+        type: string
+
+jobs:
+  security_check:
+    name: Process python code check
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+
+    env:
+      AWS_REGION: ap-northeast-1
+
+    strategy:
+      matrix:
+        dir: ${{ fromJson(inputs.deploy_environment_matrix) }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: |
+          pip install bandit pylint
+
+      - name: Run Bandit security scan
+        run: bandit -v -r ${{ matrix.dir }}/app/ -ll -f json
+
+      - name: Run Pylint for code quality
+        run: |
+          pylint_output=$(pylint $(git ls-files '${{ matrix.dir }}/app/*.py') --exit-zero)
+          echo "$pylint_output"  
+          pylint_score=$(echo "$pylint_output" | grep "Your code has been rated at" || echo "Pylint rating not found")
+          echo "#### Pylint Score：$pylint_score" >> $GITHUB_STEP_SUMMARY

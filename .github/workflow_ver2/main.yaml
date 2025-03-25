@@ -1,0 +1,110 @@
+name: Lambda code auto deploy
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - develop
+    paths-ignore:
+      - main
+      - 'feature/**'
+  
+  pull_request:
+    types:
+      - closed
+    branches:
+      - main
+    paths-ignore:
+      - develop
+      - 'feature/**'
+
+permissions:
+  id-token: write
+  contents: read
+  pull-requests: read
+
+env:
+  AWS_REGION: ap-northeast-1
+
+jobs:
+
+  filter_paths:
+    name: Process cheack changed directory
+    runs-on: ubuntu-latest
+    outputs:
+      changed_dirs: ${{ steps.set-matrix.outputs.list }}
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Filter paths
+        id: filter-paths
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            ${{ vars.CALCINPUTDOWNLOAD }}: '${{ vars.CALCINPUTDOWNLOAD }}/app/**'
+            ${{ vars.CALCOUTPUTUPLOAD }}: '${{ vars.CALCOUTPUTUPLOAD }}/app/**'
+            ${{ vars.CALCSTATUSUPDATE }}: '${{ vars.CALCSTATUSUPDATE }}/app/**'
+            ${{ vars.OPTCALCEXEC }}: '${{ vars.OPTCALCEXEC }}/app/**'
+            ${{ vars.OPTCALCSTOP }}: '${{ vars.OPTCALCSTOP }}/app/**'
+            ${{ vars.OPTTSVOUT }}: '${{ vars.OPTTSVOUT }}/app/**'
+            ${{ vars.TSVOUTINDL }}: '${{ vars.TSVOUTINDL }}/app/**'
+            ${{ vars.TSVOUTFILEUL }}: '${{ vars.TSVOUTFILEUL }}/app/**'
+            ${{ vars.TSVOUTSTATUS }}: '${{ vars.TSVOUTSTATUS }}/app/**'
+            ${{ vars.HASHGITHUBEXAMS }}: '${{ vars.HASHGITHUBEXAMS }}/app/**'
+            ${{ vars.EXAMPLEGITACTIONS }}: '${{ vars.EXAMPLEGITACTIONS }}/app/**'
+
+      - name: Set changed directories
+        id: set-matrix
+        run: |
+          list=$(echo '${{ steps.filter-paths.outputs.changes }}' | jq -c .)
+          echo "list=$list" >> $GITHUB_OUTPUT
+          echo "変更があったディレクトリ：$list" >> $GITHUB_STEP_SUMMARY
+      
+      - name: Check changed directories
+        id: changed-directories
+        run: |
+          if [[ '${{ steps.set-matrix.outputs.list }}' == '[]' ]]; then
+            echo "変更されたLambda Codeのファイルはないため、正常終了する"
+            echo "#### 変更されたLambda Codeのファイルはないため、正常終了する" >> $GITHUB_STEP_SUMMARY
+            exit 0
+          fi
+
+  security_cheak:
+    needs: filter_paths
+    name:  Code Security Cheak
+    if: startsWith(github.ref, 'refs/heads/develop') 
+        && needs.filter_paths.outputs.changed_dirs != '[]' 
+        && needs.filter_paths.outputs.changed_dirs != ''
+    uses: ./.github/workflows/security_check.yaml
+    with:
+      deploy_environment_matrix: ${{ needs.filter_paths.outputs.changed_dirs }}
+
+  develop_deploy:
+    needs: filter_paths
+    #needs: [filter_paths, security_cheak]
+    name:  Deploy to Develop
+    if: startsWith(github.ref, 'refs/heads/develop') 
+        && needs.filter_paths.outputs.changed_dirs != '[]' 
+        && needs.filter_paths.outputs.changed_dirs != ''
+    uses: ./.github/workflows/workflow.yaml
+    with:
+      deploy_environment: dev
+      deploy_environment_matrix: ${{ needs.filter_paths.outputs.changed_dirs }}
+    secrets:
+      AWS_GITHUB_ACTIONS_ROLE_ARN: ${{ secrets.AWS_GITHUB_ACTIONS_ROLE_ARN }}
+
+  main_deploy:
+    needs: filter_paths
+    name:  Deploy to Main（Test）
+    if: github.event.pull_request.base.ref == 'main'
+        && github.event.pull_request.merged == true
+        && needs.filter_paths.outputs.changed_dirs != '[]' 
+        && needs.filter_paths.outputs.changed_dirs != ''
+    uses: ./.github/workflows/workflow.yaml
+    with:
+      deploy_environment: test
+      deploy_environment_matrix: ${{ needs.filter_paths.outputs.changed_dirs }}
+    secrets:
+      AWS_GITHUB_ACTIONS_ROLE_ARN: ${{ secrets.AWS_GITHUB_ACTIONS_ROLE_ARN }}
